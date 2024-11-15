@@ -15,22 +15,36 @@ import routes from './routes/express.js';
 
 const __dirname = dirname(import.meta.url);
 
-const { PORT = 3000, ISSUER = `http://localhost:${PORT}` } = process.env;
+//const { PORT = 3000, ISSUER = `http://localhost:${PORT}` } = process.env;
+//const { PORT = 3000, ISSUER = `https://oidc.coinsgpt.io`, NODE_ENV = 'production'} = process.env;
+const { PORT = 3000, ISSUER = `https://oidc.coinsgpt.io`} = process.env;
+console.log('PORT:', PORT);
+console.log('ISSUER:', ISSUER);
 configuration.findAccount = Account.findAccount;
+console.log('Account.id:', Account.accountId);
 
 const app = express();
 
-const directives = helmet.contentSecurityPolicy.getDefaultDirectives();
-delete directives['form-action'];
+const defaultCspDirectives = helmet.contentSecurityPolicy.getDefaultDirectives();
+defaultCspDirectives['script-src']  = ["'self'", 'https://metamask-sdk.api.cx.metamask.io'];
+defaultCspDirectives['connect-src'] = ["'self'", 'https://metamask-sdk.api.cx.metamask.io', 'wss://metamask-sdk.api.cx.metamask.io', "data:"];
+//defaultCspDirectives['default-src'] = ["'self'"];
+//defaultCspDirectives['img-src'] = ["'self'", "data:"];
+delete defaultCspDirectives['form-action'];
 app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: false,
-    directives,
+    directives: defaultCspDirectives,
   },
 }));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+app.use(express.json());
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 let server;
 try {
@@ -40,9 +54,13 @@ try {
     await adapter.connect();
   }
 
-  const prod = process.env.NODE_ENV === 'production';
+  //const prod = process.env.NODE_ENV === 'production';
+  const prod = true;
 
   const provider = new Provider(ISSUER, { adapter, ...configuration });
+
+  console.log('prod:', prod);
+  //console.log('OIDC Configuration:', provider.configuration());
 
   if (prod) {
     app.enable('trust proxy');

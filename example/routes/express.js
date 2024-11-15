@@ -91,15 +91,20 @@ export default (app, provider) => {
     try {
       const { prompt: { name } } = await provider.interactionDetails(req, res);
       assert.equal(name, 'login');
+      console.log("login body1", req.body);
+      console.log("login body2", req.body);
       const account = await Account.findByLogin(req.body.login);
+      console.log("login account1", account);
 
       const result = {
         login: {
           accountId: account.accountId,
         },
       };
+      console.log("login account2", result);
 
       await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+      console.log("login account3");
     } catch (err) {
       next(err);
     }
