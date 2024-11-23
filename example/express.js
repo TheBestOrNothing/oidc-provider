@@ -26,7 +26,7 @@ console.log('Account.id:', Account.accountId);
 const app = express();
 
 const defaultCspDirectives = helmet.contentSecurityPolicy.getDefaultDirectives();
-defaultCspDirectives['script-src']  = ["'self'", 'https://metamask-sdk.api.cx.metamask.io'];
+defaultCspDirectives['script-src']  = ["'self'", 'https://metamask-sdk.api.cx.metamask.io', 'https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io', 'https://cdn.jsdelivr.net'];
 defaultCspDirectives['connect-src'] = ["'self'", 'https://metamask-sdk.api.cx.metamask.io', 'wss://metamask-sdk.api.cx.metamask.io', "data:"];
 //defaultCspDirectives['default-src'] = ["'self'"];
 //defaultCspDirectives['img-src'] = ["'self'", "data:"];

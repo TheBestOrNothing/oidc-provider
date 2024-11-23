@@ -8,6 +8,12 @@ import { urlencoded } from 'express'; // eslint-disable-line import/no-unresolve
 
 import Account from '../support/account.js';
 import { errors } from '../../lib/index.js'; // from 'oidc-provider';
+import interaction from '../../lib/views/interaction.js';
+import {
+  encrypt,
+  recoverPersonalSignature,
+  recoverTypedSignature,
+} from '@metamask/eth-sig-util';
 
 const body = urlencoded({ extended: false });
 
@@ -22,20 +28,7 @@ const debug = (obj) => querystring.stringify(Object.entries(obj).reduce((acc, [k
 });
 const { SessionNotFound } = errors;
 export default (app, provider) => {
-  app.use((req, res, next) => {
-    const orig = res.render;
-    // you'll probably want to use a full blown render engine capable of layouts
-    res.render = (view, locals) => {
-      app.render(view, locals, (err, html) => {
-        if (err) throw err;
-        orig.call(res, '_layout', {
-          ...locals,
-          body: html,
-        });
-      });
-    };
-    next();
-  });
+
 
   function setNoCache(req, res, next) {
     res.set('cache-control', 'no-store');
@@ -52,6 +45,9 @@ export default (app, provider) => {
 
       switch (prompt.name) {
         case 'login': {
+          const interactionDetails = await provider.interactionDetails(req, res);
+          console.log("interaction details before login");
+          console.log(JSON.stringify(interactionDetails, null, 2));
           return res.render('login', {
             client,
             uid,
@@ -66,13 +62,22 @@ export default (app, provider) => {
           });
         }
         case 'consent': {
+          const interactionDetails = await provider.interactionDetails(req, res);
+          console.log("interaction details before consent");
+          console.log(JSON.stringify(interactionDetails, null, 2));
+          const last = interactionDetails.lastSubmission;
+          console.log("last submitted");
+          console.log(JSON.stringify(last, null, 2));
+
           return res.render('interaction', {
             client,
             uid,
             details: prompt.details,
             params,
             title: 'Authorize',
-            session: session ? debug(session) : undefined,
+            //session: session ? debug(session) : undefined,
+            session: session,
+            lastSubmission: interactionDetails.lastSubmission,
             dbg: {
               params: debug(params),
               prompt: debug(prompt),
@@ -92,19 +97,38 @@ export default (app, provider) => {
       const { prompt: { name } } = await provider.interactionDetails(req, res);
       assert.equal(name, 'login');
       console.log("login body1", req.body);
-      console.log("login body2", req.body);
-      const account = await Account.findByLogin(req.body.login);
-      console.log("login account1", account);
+
+      const { accounts, sign, url, localeDate } = req.body;
+      const siweMessage = `Issued At:\n${localeDate}\n\nURL:\n${url}`;
+      console.log(siweMessage);
+      const recoveredAddr = recoverPersonalSignature({
+        data: siweMessage,
+        signature: sign,
+      });
+
+      if (accounts.includes(recoveredAddr)) {
+        console.log(`SigUtil Successfully verified signer as ${recoveredAddr}`);
+      } else {
+        console.log(
+          `SigUtil Failed to verify signer when comparing ${recoveredAddr} to ${accounts}`,
+        );
+        //terminal the login process
+      }
+
+      const identity = await Account.findByLogin(recoveredAddr);
+      console.log("login identity", identity);
 
       const result = {
         login: {
-          accountId: account.accountId,
+          accountId: identity.accountId,
         },
+        recoveredAddr: recoveredAddr,
+        url: url,
+        localeDate: localeDate,
       };
-      console.log("login account2", result);
+      console.log("login result", result);
 
-      await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
-      console.log("login account3");
+      await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: true });
     } catch (err) {
       next(err);
     }
