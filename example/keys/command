@@ -1,0 +1,45 @@
+# how to restart the synapse server
+# please start the oidc server before start synapse server 
+
+cd ~/synapse
+source env/bin/activate
+synctl start
+
+# Synapse jwt login
+1. userinfo endpoint return jwt userinfo
+// the access_token is set after bearer 
+curl -H "Authorization: Bearer x5dGZivijdE7Wl0_ZGkcWqYnO_0dq9xJ67U-HBKYR_6" https://oidc.coinsgpt.io/me
+
+{eyJ0eXA.eyJzdW.zQIc}
+
+2. synapse use jwt userinof to login
+curl https://synapse.coinsgpt.io/_matrix/client/r0/login -X POST     --data '{"type":"org.matrix.login.jwt","token":"eyJ0eXA.eyJzdW.zQIc"}'
+
+{"user_id":"@0x4477610799e7910f0e40f64da702aa9ffcf929ac:synapse.coinsgpt.io",
+ "access_token":"syt_MHg0NDc3NjEwNzk5ZTc5MTBmMGU0MGY2NGRhNzAyYWE5ZmZjZjkyOWFj_ofVnzCkLzkuAaayQalBI_2joSKE",
+ "home_server":"synapse.coinsgpt.io",
+ "device_id":"ZCJQMNZUSS"}
+
+
+# Retrive token grant_type=client_credentials
+curl -X POST https://oidc.coinsgpt.io/token   -H "Content-Type: application/x-www-form-urlencoded"   -u "oidcCLIENT:oidcSECRET"   -d "grant_type=client_credentials&scope=openid"
+
+curl -X POST https://oidc.coinsgpt.io/token/introspection   -H "Content-Type: application/x-www-form-urlencoded"   -u "oidcCLIENT:oidcSECRET"   -d "grant_type=client_credentials&token=Tp5aVRWlvut6g2EHNR0sPtm-O3hDwoZf5kGozQcc5lV"
+
+
+
+curl -X POST https://oidc.coinsgpt.io/token   -H "Content-Type: application/x-www-form-urlencoded"   -u "oidcCLIENT:oidcSECRET"   -d "grant_type=client_credentials&scope=openid&resource=urn:api"
+
+{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6ImF0K2p3dCIsImtpZCI6InIxTGtiQm8zOTI1UmIyWkZGckt5VTNNVmV4OVQyODE3S3gwdmJpNmlfS2MifQ.eyJqdGkiOiJTX3d0NjdadXF2ZG9EbXpVVDdxbWMiLCJzdWIiOiJvaWRjQ0xJRU5UIiwiaWF0IjoxNzMwNTk0MjkzLCJleHAiOjE3MzA1OTc4OTMsImNsaWVudF9pZCI6Im9pZGNDTElFTlQiLCJpc3MiOiJodHRwczovL29pZGMuY29pbnNncHQuaW8iLCJhdWQiOiJ1cm46YXBpIn0.WzQutz-TMSYYoSacNTLCpsrNImm0jcJu3mgLGBXx6KBhDyi1NOhLQrJt1etKfNa2X5cZgUsdALX8uXcOwEG2zN1-MyRMr720f5eXzjlsf0wHHURY641424nQ3IlHeHYn6qwCDISylGRMP09E7gvV_FQnrWGVE_6fjcJimrMQblXk4e8cLBhq7UYnvXmOtFfcH1VDyjOjGBuzFu8xzgO0Ri-yYtwVf_VtIOwdotxkh20LbNtpiOTRwclC39jbtUuNVtfcm_RYfMipzJrTE7XHeEAQI6iNMm1ybdeFKuN9bne4g6cH4R1khMt3M45OHSm4yuuHYJxKcWf3QvZYbUp4Yw","expires_in":3600,"token_type":"Bearer"}
+
+
+curl -X POST https://oidc.coinsgpt.io/token   -H "Content-Type: application/x-www-form-urlencoded"   -u "oidcCLIENT:oidcSECRET"   -d "grant_type=client_credentials&token=eyJhbGciOiJSUzI1NiIsInR5cCI6ImF0K2p3dCIsImtpZCI6InIxTGtiQm8zOTI1UmIyWkZGckt5VTNNVmV4OVQyODE3S3gwdmJpNmlfS2MifQ.eyJqdGkiOiJTX3d0NjdadXF2ZG9EbXpVVDdxbWMiLCJzdWIiOiJvaWRjQ0xJRU5UIiwiaWF0IjoxNzMwNTk0MjkzLCJleHAiOjE3MzA1OTc4OTMsImNsaWVudF9pZCI6Im9pZGNDTElFTlQiLCJpc3MiOiJodHRwczovL29pZGMuY29pbnNncHQuaW8iLCJhdWQiOiJ1cm46YXBpIn0.WzQutz-TMSYYoSacNTLCpsrNImm0jcJu3mgLGBXx6KBhDyi1NOhLQrJt1etKfNa2X5cZgUsdALX8uXcOwEG2zN1-MyRMr720f5eXzjlsf0wHHURY641424nQ3IlHeHYn6qwCDISylGRMP09E7gvV_FQnrWGVE_6fjcJimrMQblXk4e8cLBhq7UYnvXmOtFfcH1VDyjOjGBuzFu8xzgO0Ri-yYtwVf_VtIOwdotxkh20LbNtpiOTRwclC39jbtUuNVtfcm_RYfMipzJrTE7XHeEAQI6iNMm1ybdeFKuN9bne4g6cH4R1khMt3M45OHSm4yuuHYJxKcWf3QvZYbUp4Yw"
+
+{"access_token":"HVusIUmMZoCKNOK_lt36VKo8G2X8wzG0ei6kUYhrFIt","expires_in":600,"token_type":"Bearer"}
+
+curl -X POST https://oidc.coinsgpt.io/token/introspection   -H "Content-Type: application/x-www-form-urlencoded"   -u "oidcCLIENT:oidcSECRET"   -d "grant_type=client_credentials&token=HVusIUmMZoCKNOK_lt36VKo8G2X8wzG0ei6kUYhrFIt"
+
+{"active":true,"client_id":"oidcCLIENT","exp":1730595117,"iat":1730594517,"iss":"https://oidc.coinsgpt.io","token_type":"Bearer"}
+
+
+curl https://synapse.coinsgpt.io/_matrix/client/r0/login -X POST     --data '{"type":"org.matrix.login.jwt","token":""}'
