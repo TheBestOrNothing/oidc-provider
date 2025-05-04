@@ -4,8 +4,16 @@ export default {
       client_id: 'oidcCLIENT',
       client_secret: 'oidcSECRET',
       grant_types: ['refresh_token', 'authorization_code', 'client_credentials'],
-      redirect_uris: ['https://synapse.coinsgpt.io/_synapse/client/oidc/callback', 'https://chat.openai.com/aip/g-4b5fe9af2498079f780a998b4a7c2934c0a0b201/oauth/callback', 'http://sso-client.dev/providers/8/open_id'],
-      userinfo_signed_response_alg: 'RS256',
+      redirect_uris: ['https://synapse.coinsgpt.io/_synapse/client/oidc/callback', 
+	              'https://chat.openai.com/aip/g-4b5fe9af2498079f780a998b4a7c2934c0a0b201/oauth/callback', 
+	              'http://sso-client.dev/providers/8/open_id',
+	              'https://chat.openai.com/aip/g-27f3c0df56f9ec320cd1dc49fbaa8b8729d0819e/oauth/callback',
+	      	      'http://mail.coinsgpt.io/index.php/login/oauth',
+	      	      'https://roundcube.gitcoins.io/index.php/login/oauth',
+	      	      'http://roundcube.gitcoins.io/index.php/login/oauth',
+	              'https://matrix.coinsgpt.io/_synapse/client/oidc/callback',
+	      	      'http://gitcoins.io/index.php/login/oauth'],
+      //userinfo_signed_response_alg: 'RS256',
     }
   ],
   formats: {
@@ -66,7 +74,7 @@ export default {
     },
   },
   enabledJWA: {
-    userinfoSigningAlgValues: ['RS256', 'HS256'], // Add your desired algorithms here
+    //userinfoSigningAlgValues: ['RS256', 'HS256'], // Add your desired algorithms here
   },
   jwks: {
     keys: [

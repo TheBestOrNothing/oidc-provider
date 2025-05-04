@@ -33,6 +33,10 @@ class Account {
 
     return {
       sub: this.accountId, // it is essential to always return a sub claim
+      mail: this.accountId + '@gitcoins.io',
+      email: this.accountId + '@gitcoins.io',
+      name: this.accountId,
+      user_name: this.accountId,
 
       address: {
         country: '000',
@@ -43,7 +47,8 @@ class Account {
         street_address: '000',
       },
       birthdate: '1987-10-16',
-      email: 'johndoe@example.com',
+      //email: 'test@coinsgpt.io',
+      //mail: 'test@coinsgpt.io',
       email_verified: false,
       family_name: 'Doe',
       gender: 'male',
