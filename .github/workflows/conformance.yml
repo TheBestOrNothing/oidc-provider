@@ -205,7 +205,7 @@ jobs:
           export VERSION=($(curl --silent "https://gitlab.com/api/v4/projects/4175605/releases" | jq -r '.[0].tag_name'))
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Load Cached Conformance Suite Build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache
         with:
           path: ./conformance-suite
